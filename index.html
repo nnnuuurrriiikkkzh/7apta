@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#4256d0" />
+    <title>Дело — менеджер задач</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="logo" href="./"
+        ><span>✓</span> дело<span class="logo-dot">.</span></a
+      >
+      <div class="workspace-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+      <nav>
+        <button class="nav active" data-view="tasks">
+          ▤ <span>Задачи</span><b id="nav-count">0</b></button
+        ><button class="nav" data-view="people">
+          ♧ <span>Люди</span><b id="people-count">0</b>
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="connection-dot"></span> DummyJSON API
+        <p>Меньше суеты.<br />Больше сделанного.</p>
+        <small>Ваше пространство для дел</small>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <span>Рабочее пространство <span class="breadcrumb">/ Обзор</span></span
+        ><span class="workspace-badge">Личное пространство</span>
+      </header>
+      <div class="content">
+        <section class="heading">
+          <div>
+            <div class="eyebrow">ВСЁ ПОД КОНТРОЛЕМ</div>
+            <h1 id="page-title">Ваши задачи</h1>
+            <p id="page-subtitle">
+              Освободите голову. Соберите все дела в одном месте.
+            </p>
+          </div>
+          <button class="primary" id="new-task">＋ Новая задача</button>
+        </section>
+        <div id="notice" role="status" hidden></div>
+        <section class="stats" aria-label="Статистика">
+          <article>
+            <span class="stat-icon blue">▤</span>
+            <div><span>Всего задач</span><strong id="total">—</strong></div>
+          </article>
+          <article>
+            <span class="stat-icon amber">◷</span>
+            <div><span>В работе</span><strong id="pending">—</strong></div>
+          </article>
+          <article>
+            <span class="stat-icon green">✓</span>
+            <div><span>Выполнено</span><strong id="done">—</strong></div>
+            <div class="progress-ring" id="progress">0%</div>
+          </article>
+        </section>
+        <section id="tasks-view" class="panel">
+          <div class="panel-heading">
+            <h2>Все задачи <span class="pill" id="result-count">0</span></h2>
+            <button id="refresh" class="quiet">↻ Обновить</button>
+          </div>
+          <div class="filters">
+            <label class="search-field"
+              ><span>Поиск по названию</span
+              ><input
+                id="search"
+                type="search"
+                placeholder="⌕  Найти задачу…" /></label
+            ><label
+              ><span>Исполнитель</span
+              ><select id="person-filter">
+                <option value="">Все люди</option>
+              </select></label
+            ><label
+              ><span>Сортировка через API</span
+              ><select id="sort">
+                <option value="">Без сортировки</option>
+                <option value="asc">Название: А → Я</option>
+                <option value="desc">Название: Я → А</option>
+              </select></label
+            >
+          </div>
+          <div class="tabs" role="group" aria-label="Статус задач">
+            <button data-status="all" class="selected">Все задачи</button
+            ><button data-status="pending">В работе</button
+            ><button data-status="done">Выполнено</button>
+          </div>
+          <div id="task-list" class="task-list" aria-live="polite">
+            <div class="empty">Загружаем задачи и людей…</div>
+          </div>
+          <footer class="list-footer">
+            <span id="list-info"></span
+            ><button id="more" class="quiet" hidden>Показать ещё 30 ↓</button>
+          </footer>
+        </section>
+        <section id="people-view" class="panel" hidden>
+          <div class="panel-heading">
+            <h2>Люди <span class="pill" id="directory-count">0</span></h2>
+          </div>
+          <div class="filters people-filters">
+            <label
+              ><span>Поиск человека</span
+              ><input
+                type="search"
+                id="people-search"
+                placeholder="Имя, логин или ID…" /></label
+            ><label
+              ><span>Сортировка через API</span
+              ><select id="people-sort">
+                <option value="asc">Имя: А → Я</option>
+                <option value="desc">Имя: Я → А</option>
+              </select></label
+            >
+          </div>
+          <div id="people-list" class="people-grid"></div>
+        </section>
+        <p class="storage-note">
+          Данные — DummyJSON. Ваши изменения сохраняются в этом браузере.
+        </p>
+      </div>
+    </main>
+    <dialog id="task-dialog">
+      <form id="task-form">
+        <div class="dialog-heading">
+          <div>
+            <div class="eyebrow">ПЛАНИРУЕМ ДЕЛА</div>
+            <h2 id="task-dialog-title">Новая задача</h2>
+          </div>
+          <button type="button" class="icon-button close" aria-label="Закрыть">
+            ×
+          </button>
+        </div>
+        <label
+          >Название задачи<input
+            id="task-title"
+            required
+            maxlength="500"
+            placeholder="Что нужно сделать?" /></label
+        ><label>Исполнитель<select id="task-person" required></select></label
+        ><label class="check-label"
+          ><input type="checkbox" id="task-completed" /> Уже выполнено</label
+        >
+        <p class="form-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" class="secondary close">Отмена</button
+          ><button class="primary" type="submit">Сохранить задачу</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="profile-dialog" class="profile-dialog">
+      <div class="dialog-heading">
+        <h2>Карточка человека</h2>
+        <button class="icon-button close" aria-label="Закрыть">×</button>
+      </div>
+      <div id="profile-content"></div>
+    </dialog>
+    <dialog id="person-dialog">
+      <form id="person-form">
+        <div class="dialog-heading">
+          <h2>Изменить профиль</h2>
+          <button type="button" class="icon-button close" aria-label="Закрыть">
+            ×
+          </button>
+        </div>
+        <label>Имя<input id="person-first" required maxlength="60" /></label
+        ><label>Фамилия<input id="person-last" required maxlength="60" /></label
+        ><label>Email<input type="email" id="person-email" required /></label
+        ><label
+          >Телефон<input id="person-phone" required maxlength="50"
+        /></label>
+        <p class="form-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" class="secondary close">Отмена</button
+          ><button class="primary">Сохранить</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="delete-dialog">
+      <form id="delete-form">
+        <div class="dialog-heading">
+          <h2>Удалить задачу?</h2>
+          <button type="button" class="icon-button close" aria-label="Закрыть">
+            ×
+          </button>
+        </div>
+        <p id="delete-title"></p>
+        <p class="form-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" class="secondary close">Отмена</button
+          ><button class="danger">Удалить задачу</button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+  </body>
+</html>

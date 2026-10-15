@@ -1,0 +1,14 @@
+{
+  "name": "delo-task-manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Менеджер задач и пользователей на DummyJSON",
+  "scripts": {
+    "start": "node server.cjs",
+    "check": "node --check app.js && node --check server.cjs",
+    "test": "node tests/app.test.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}
