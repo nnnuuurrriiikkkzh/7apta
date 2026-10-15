@@ -458,10 +458,43 @@ function renderProfile() {
   tools.append(edit);
   left.append(tools);
   const assigned = tasks().filter((t) => t.userId === u.id);
+  const sortMode = saved.profileSort || "default";
+  const byTitle = (a, b) => a.todo.localeCompare(b.todo, "ru", { sensitivity: "base" });
+  const byNumber = (a, b) => Number(a.displayId || a.id) - Number(b.displayId || b.id);
+  const comparators = {
+    "title-asc": byTitle,
+    "title-desc": (a, b) => byTitle(b, a),
+    "id-asc": byNumber,
+    "id-desc": (a, b) => byNumber(b, a),
+    pending: (a, b) => Number(a.completed) - Number(b.completed) || byTitle(a, b),
+    done: (a, b) => Number(b.completed) - Number(a.completed) || byTitle(a, b),
+  };
+  if (comparators[sortMode]) assigned.sort(comparators[sortMode]);
   right.append(el("h3", "", `Задачи человека · ${assigned.length}`));
   const add = el("button", "primary", "＋ Назначить задачу");
   add.onclick = () => openTask(null, u.id);
   right.append(add);
+  const sortLabel = el("label", "profile-sort", "Сортировка задач");
+  const sortSelect = el("select");
+  sortSelect.id = "profile-task-sort";
+  for (const [value, title] of [
+    ["default", "Без сортировки"],
+    ["title-asc", "По алфавиту: А → Я"],
+    ["title-desc", "По алфавиту: Я → А"],
+    ["id-asc", "По номеру: по возрастанию"],
+    ["id-desc", "По номеру: по убыванию"],
+    ["pending", "Сначала невыполненные"],
+    ["done", "Сначала выполненные"],
+  ]) sortSelect.add(new Option(title, value));
+  sortSelect.value = sortMode;
+  sortSelect.onchange = () => {
+    saved.profileSort = sortSelect.value;
+    persist();
+    renderProfile();
+    $("#profile-task-sort").focus();
+  };
+  sortLabel.append(sortSelect);
+  right.append(sortLabel);
   if (!assigned.length)
     right.append(el("p", "empty", "Пока нет задач. Назначьте первую."));
   assigned.forEach((t) => right.append(row(t)));

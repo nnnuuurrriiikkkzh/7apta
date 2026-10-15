@@ -639,6 +639,9 @@ dialog select {
 .profile-tasks h3 {
   font-size: 14px;
 }
+.profile-tasks .profile-sort {
+  margin: 18px 0 6px;
+}
 .profile-tools {
   display: flex;
   gap: 8px;
